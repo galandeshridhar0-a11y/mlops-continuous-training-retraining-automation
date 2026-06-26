@@ -100,7 +100,7 @@ jobs:
       - name: Upload datasets as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: datasets-${{ steps.hash.outputs.hash }}
+          name: datasets-${{ github.run_id }}
           path: data/
           retention-days: 30
 
@@ -128,8 +128,16 @@ jobs:
       - name: Download datasets
         uses: actions/download-artifact@v4
         with:
-          name: datasets-${{ needs.generate-data.outputs.data_hash }}
+          name: datasets-${{ github.run_id }}
           path: data/
+          if-no-files-found: warn
+
+      - name: Ensure datasets exist
+        run: |
+          if [ ! -f data/reference.csv ] || [ ! -f data/production.csv ]; then
+            echo "Dataset artifact missing or incomplete; regenerating data..."
+            python data_generator.py
+          fi
 
       - name: Restore current model (if cached)
         uses: actions/cache@v4
@@ -216,8 +224,16 @@ jobs:
       - name: Download datasets
         uses: actions/download-artifact@v4
         with:
-          name: datasets-${{ needs.generate-data.outputs.data_hash }}
+          name: datasets-${{ github.run_id }}
           path: data/
+          if-no-files-found: warn
+
+      - name: Ensure datasets exist
+        run: |
+          if [ ! -f data/reference.csv ] || [ ! -f data/production.csv ]; then
+            echo "Dataset artifact missing or incomplete; regenerating data..."
+            python data_generator.py
+          fi
 
       - name: Retrain on reference + production data
         run: python train.py --combine
@@ -259,8 +275,16 @@ jobs:
       - name: Download datasets
         uses: actions/download-artifact@v4
         with:
-          name: datasets-${{ needs.generate-data.outputs.data_hash }}
+          name: datasets-${{ github.run_id }}
           path: data/
+          if-no-files-found: warn
+
+      - name: Ensure datasets exist
+        run: |
+          if [ ! -f data/reference.csv ] || [ ! -f data/production.csv ]; then
+            echo "Dataset artifact missing or incomplete; regenerating data..."
+            python data_generator.py
+          fi
 
       - name: Download candidate model
         uses: actions/download-artifact@v4
