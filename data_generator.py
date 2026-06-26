@@ -20,7 +20,8 @@ np.random.seed(42)
 
 # ── Column names ──────────────────────────────────────────────────────────────
 FEATURE_COLS = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
-TARGET_COL   = "species"
+TARGET_COL = "species"
+
 
 def load_iris_as_dataframe() -> pd.DataFrame:
     """Load the Iris dataset as a named DataFrame."""
@@ -35,14 +36,18 @@ def generate_reference_data(df: pd.DataFrame, save_path: str) -> pd.DataFrame:
     Reference data = the distribution the model was trained on.
     Uses 80% of clean Iris data.
     """
-    train_df, _ = train_test_split(df, test_size=0.2, random_state=42, stratify=df[TARGET_COL])
+    train_df, _ = train_test_split(
+        df, test_size=0.2, random_state=42, stratify=df[TARGET_COL]
+    )
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     train_df.reset_index(drop=True).to_csv(save_path, index=False)
     print(f"Reference data saved → {save_path}  ({len(train_df)} rows)")
     return train_df
 
 
-def generate_production_data(df: pd.DataFrame, save_path: str, drift_type: str = "covariate") -> pd.DataFrame:
+def generate_production_data(
+    df: pd.DataFrame, save_path: str, drift_type: str = "covariate"
+) -> pd.DataFrame:
     """
     Production data = what arrives after deployment.
     Injects realistic drift to simulate a changing real-world distribution.
@@ -53,7 +58,9 @@ def generate_production_data(df: pd.DataFrame, save_path: str, drift_type: str =
       "prior"     → class balance shifts (label drift)
       "combined"  → both covariate + prior drift
     """
-    _, test_df = train_test_split(df, test_size=0.2, random_state=42, stratify=df[TARGET_COL])
+    _, test_df = train_test_split(
+        df, test_size=0.2, random_state=42, stratify=df[TARGET_COL]
+    )
     prod_df = test_df.copy().reset_index(drop=True)
 
     if drift_type == "covariate":
@@ -62,21 +69,25 @@ def generate_production_data(df: pd.DataFrame, save_path: str, drift_type: str =
         # petal_width has more variance (e.g. new subspecies mix)
         print("Injecting covariate drift: sepal_length +0.4, petal_width +noise")
         prod_df["sepal_length"] = prod_df["sepal_length"] + 0.4
-        prod_df["petal_width"]  = prod_df["petal_width"]  + np.random.normal(0, 0.3, len(prod_df))
-        prod_df["petal_width"]  = prod_df["petal_width"].clip(lower=0.0)
+        prod_df["petal_width"] = prod_df["petal_width"] + np.random.normal(
+            0, 0.3, len(prod_df)
+        )
+        prod_df["petal_width"] = prod_df["petal_width"].clip(lower=0.0)
 
     elif drift_type == "prior":
         # Class balance shifts: oversample virginica (class 2)
         print("Injecting prior drift: oversample class 2 (virginica)")
         virginica = prod_df[prod_df[TARGET_COL] == 2]
-        prod_df   = pd.concat([prod_df, virginica, virginica], ignore_index=True)
+        prod_df = pd.concat([prod_df, virginica, virginica], ignore_index=True)
 
     elif drift_type == "combined":
         print("Injecting combined covariate + prior drift")
         prod_df["sepal_length"] = prod_df["sepal_length"] + 0.4
-        prod_df["petal_width"]  = prod_df["petal_width"]  + np.random.normal(0, 0.3, len(prod_df))
+        prod_df["petal_width"] = prod_df["petal_width"] + np.random.normal(
+            0, 0.3, len(prod_df)
+        )
         virginica = prod_df[prod_df[TARGET_COL] == 2]
-        prod_df   = pd.concat([prod_df, virginica], ignore_index=True)
+        prod_df = pd.concat([prod_df, virginica], ignore_index=True)
 
     else:  # "none"
         print("No drift injected (clean production data)")
@@ -84,11 +95,15 @@ def generate_production_data(df: pd.DataFrame, save_path: str, drift_type: str =
     prod_df = prod_df.sample(frac=1, random_state=42).reset_index(drop=True)
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     prod_df.to_csv(save_path, index=False)
-    print(f"Production data saved → {save_path}  ({len(prod_df)} rows, drift='{drift_type}')")
+    print(
+        f"Production data saved → {save_path}  ({len(prod_df)} rows, drift='{drift_type}')"
+    )
     return prod_df
 
 
-def generate_golden_dataset(df: pd.DataFrame, save_path: str, n_per_class: int = 5) -> pd.DataFrame:
+def generate_golden_dataset(
+    df: pd.DataFrame, save_path: str, n_per_class: int = 5
+) -> pd.DataFrame:
     """
     Golden dataset = curated set of representative examples with KNOWN correct labels.
     Used as a hard evaluation gate before any new model is promoted.
@@ -98,9 +113,9 @@ def generate_golden_dataset(df: pd.DataFrame, save_path: str, n_per_class: int =
     """
     golden_rows = []
     for cls in sorted(df[TARGET_COL].unique()):
-        cls_df      = df[df[TARGET_COL] == cls].copy()
-        centroid    = cls_df[FEATURE_COLS].mean().values
-        distances   = np.linalg.norm(cls_df[FEATURE_COLS].values - centroid, axis=1)
+        cls_df = df[df[TARGET_COL] == cls].copy()
+        centroid = cls_df[FEATURE_COLS].mean().values
+        distances = np.linalg.norm(cls_df[FEATURE_COLS].values - centroid, axis=1)
         cls_df["_dist"] = distances
         # Take the n closest to centroid (most representative)
         top_n = cls_df.nsmallest(n_per_class, "_dist").drop(columns=["_dist"])
@@ -109,7 +124,9 @@ def generate_golden_dataset(df: pd.DataFrame, save_path: str, n_per_class: int =
     golden_df = pd.concat(golden_rows, ignore_index=True)
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     golden_df.to_csv(save_path, index=False)
-    print(f"Golden dataset saved  → {save_path}  ({len(golden_df)} rows, {n_per_class}/class)")
+    print(
+        f"Golden dataset saved  → {save_path}  ({len(golden_df)} rows, {n_per_class}/class)"
+    )
     return golden_df
 
 
@@ -119,11 +136,15 @@ if __name__ == "__main__":
     print("=" * 55)
 
     df = load_iris_as_dataframe()
-    print(f"\nFull Iris dataset: {len(df)} rows, {df[TARGET_COL].value_counts().to_dict()}")
+    print(
+        f"\nFull Iris dataset: {len(df)} rows, {df[TARGET_COL].value_counts().to_dict()}"
+    )
 
     # Create all three datasets
-    ref_df    = generate_reference_data(df, "data/reference.csv")
-    prod_df   = generate_production_data(df, "data/production.csv", drift_type="covariate")
+    ref_df = generate_reference_data(df, "data/reference.csv")
+    prod_df = generate_production_data(
+        df, "data/production.csv", drift_type="covariate"
+    )
     golden_df = generate_golden_dataset(df, "data/golden.csv", n_per_class=5)
 
     print("\nSummary:")
