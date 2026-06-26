@@ -55,7 +55,7 @@ jobs:
 
       - name: Lint (flake8)
         run: |
-          flake8 . --max-line-length=200 \
+          flake8 . --max-line-length=100 \
                    --exclude=.git,__pycache__ \
                    --per-file-ignores="__init__.py:F401"
 
@@ -88,8 +88,14 @@ jobs:
       - name: Hash data files (for cache key)
         id: hash
         run: |
-          hash=$(md5sum data/*.csv | md5sum | cut -d' ' -f1)
+          if [ -f data/*.csv ]; then
+            hash=$(md5sum data/*.csv 2>/dev/null | md5sum | cut -d' ' -f1)
+          else
+            hash="$(date +%s)"
+          fi
+          [ -z "$hash" ] && hash="fallback-$(date +%s)"
           echo "hash=$hash" >> $GITHUB_OUTPUT
+          echo "Artifact hash: $hash"
 
       - name: Upload datasets as artifact
         uses: actions/upload-artifact@v4
