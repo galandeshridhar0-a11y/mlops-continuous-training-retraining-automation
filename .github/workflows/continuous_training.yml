@@ -43,9 +43,9 @@ jobs:
     name: "Lint & Unit Tests"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -72,9 +72,9 @@ jobs:
     outputs:
       data_hash: ${{ steps.hash.outputs.hash }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -109,9 +109,9 @@ jobs:
       should_retrain: ${{ steps.check.outputs.should_retrain }}
       trigger_reasons: ${{ steps.check.outputs.trigger_reasons }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -197,9 +197,9 @@ jobs:
       needs.monitor.outputs.should_retrain == 'true' ||
       github.event.inputs.force_retrain == 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -240,9 +240,9 @@ jobs:
     outputs:
       all_passed: ${{ steps.eval.outputs.all_passed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -294,9 +294,9 @@ jobs:
       needs.evaluate.outputs.all_passed == 'true' &&
       github.event.inputs.dry_run != 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
