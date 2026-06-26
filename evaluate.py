@@ -345,6 +345,21 @@ def promote_local_pkl() -> None:
     print(f"  Local pkl promoted: {src} → {dst}")
 
 
+def promote_candidate(candidate_path: str, production_path: str) -> None:
+    """Compatibility wrapper used by CI/CD workflows."""
+    if not os.path.exists(candidate_path):
+        raise FileNotFoundError(f"Candidate model not found: {candidate_path}")
+    os.makedirs(os.path.dirname(production_path) or ".", exist_ok=True)
+    import shutil
+
+    if os.path.exists(production_path):
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        archived = production_path.replace(".pkl", f"_archived_{ts}.pkl")
+        shutil.copy2(production_path, archived)
+    shutil.copy2(candidate_path, production_path)
+    print(f"  Promoted {candidate_path} → {production_path}")
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Main evaluation
 # ══════════════════════════════════════════════════════════════════════════════
