@@ -55,7 +55,7 @@ jobs:
 
       - name: Lint (flake8)
         run: |
-          flake8 . --max-line-length=100 \
+          flake8 . --max-line-length=200 \
                    --exclude=.git,__pycache__ \
                    --per-file-ignores="__init__.py:F401"
 

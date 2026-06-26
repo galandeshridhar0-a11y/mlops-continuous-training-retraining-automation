@@ -22,7 +22,7 @@ import os
 import pickle
 import warnings
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd

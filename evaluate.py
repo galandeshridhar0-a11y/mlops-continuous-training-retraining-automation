@@ -34,11 +34,9 @@ from mlflow.tracking import MlflowClient
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
-    precision_score,
     recall_score,
 )
 from sklearn.model_selection import train_test_split
-from scipy import stats
 
 warnings.filterwarnings("ignore")
 
@@ -169,10 +167,12 @@ def gate_minimum_thresholds(bundle: Dict, test_df: pd.DataFrame) -> Tuple[bool, 
     f1 = float(f1_score(y_true, y_pred, average="macro"))
     passed = acc >= GATES["minimum_accuracy"] and f1 >= GATES["minimum_f1_macro"]
     print(
-        f"  Accuracy:   {acc:.4f}  (min={GATES['minimum_accuracy']})  {'✅' if acc>=GATES['minimum_accuracy'] else '🚨'}"
+        f"  Accuracy:   {acc:.4f}  (min={GATES['minimum_accuracy']})  "
+        f"{'✅' if acc>=GATES['minimum_accuracy'] else '🚨'}"
     )
     print(
-        f"  F1 (macro): {f1:.4f}  (min={GATES['minimum_f1_macro']})  {'✅' if f1>=GATES['minimum_f1_macro'] else '🚨'}"
+        f"  F1 (macro): {f1:.4f}  (min={GATES['minimum_f1_macro']})  "
+        f"{'✅' if f1>=GATES['minimum_f1_macro'] else '🚨'}"
     )
     print(f"  Result: {'PASS ✅' if passed else 'FAIL 🚨'}")
     return passed, {
@@ -196,7 +196,8 @@ def gate_golden_dataset(bundle: Dict, golden_df: pd.DataFrame) -> Tuple[bool, Di
     n_wrong = int((y_pred != y_true).sum())
     passed = acc >= GATES["golden_accuracy"]
     print(
-        f"  {len(golden_df)} examples ({len(golden_df)//3}/class)  |  wrong={n_wrong}  |  acc={acc:.4f}"
+        f"  {len(golden_df)} examples ({len(golden_df)//3}/class)  |  "
+        f"wrong={n_wrong}  |  acc={acc:.4f}"
     )
     if n_wrong > 0:
         for idx in np.where(y_pred != y_true)[0]:

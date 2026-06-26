@@ -30,16 +30,15 @@ from datetime import datetime, timezone
 from typing import Dict, Tuple
 
 import matplotlib
-
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import mlflow
-import mlflow.sklearn
-import yaml
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (
+import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import mlflow  # noqa: E402
+import mlflow.sklearn  # noqa: E402
+import yaml  # noqa: E402
+from sklearn.ensemble import RandomForestClassifier  # noqa: E402
+from sklearn.metrics import (  # noqa: E402
     accuracy_score,
     classification_report,
     confusion_matrix,
@@ -47,7 +46,7 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
 )
-from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.model_selection import cross_val_score, train_test_split  # noqa: E402
 
 warnings.filterwarnings("ignore")
 
@@ -270,7 +269,7 @@ def run_training(data_path: str = None, combine: bool = False) -> Dict:
     ) as run:
         run_id = run.info.run_id
         print(f"\nMLflow run_id: {run_id}")
-        print(f"MLflow UI:     mlflow ui  (then open http://localhost:5000)")
+        print("MLflow UI:     mlflow ui  (then open http://localhost:5000)")
 
         # ── Tags ─────────────────────────────────────────────────────────────
         mlflow.set_tags(
@@ -315,7 +314,7 @@ def run_training(data_path: str = None, combine: bool = False) -> Dict:
         cm_path = "reports/confusion_matrix.png"
         plot_confusion_matrix(cm, cm_path)
         mlflow.log_artifact(cm_path, artifact_path="plots")
-        print(f"Confusion matrix → MLflow artefact (plots/confusion_matrix.png)")
+        print("Confusion matrix → MLflow artefact (plots/confusion_matrix.png)")
 
         # ── Log model to MLflow Model Registry ────────────────────────────────
         # mlflow.sklearn.log_model logs the model AND creates a model signature

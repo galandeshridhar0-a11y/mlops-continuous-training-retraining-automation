@@ -228,7 +228,9 @@ def run_pipeline(force_retrain=False, monitor_only=False, dry_run=False) -> Dict
 
         except Exception as exc:
             run_record["outcome"] = f"error: {exc}"
-            mlflow.set_tag("outcome", f"error")
+            mlflow.set_tag(
+                "outcome", "error"
+            )
             mlflow.set_tag("error_message", str(exc))
             print(f"  🚨 Pipeline error: {exc}")
             import traceback
@@ -256,7 +258,7 @@ def run_pipeline(force_retrain=False, monitor_only=False, dry_run=False) -> Dict
 
     # Summary
     print("\n" + "=" * 55)
-    print(f"  PIPELINE COMPLETE")
+    print("  PIPELINE COMPLETE")
     print(f"  Outcome:  {run_record['outcome'].upper()}")
     print(f"  Duration: {run_record.get('duration_secs', 0):.1f}s")
     print(f"  MLflow:   {MLFLOW_CFG['tracking_uri']}")

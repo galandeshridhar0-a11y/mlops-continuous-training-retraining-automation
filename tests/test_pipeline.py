@@ -5,12 +5,17 @@ Unit tests for the Iris CT pipeline components.
 Run with:  pytest tests/ -v
 """
 
-import os, sys, json, pickle, pytest, numpy as np, pandas as pd
+import os
+import pickle
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import load_iris
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import pytest  # noqa: E402
+from sklearn.ensemble import RandomForestClassifier  # noqa: E402
+from sklearn.datasets import load_iris  # noqa: E402
 
 FEATURE_COLS = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
 TARGET_COL = "species"
@@ -188,8 +193,6 @@ def test_psi_trigger_fires_on_large_drift(iris_df):
 
 def test_active_learning_trigger_high_confidence(iris_df, trained_model, tmp_path):
     """A well-trained model should NOT fire the uncertainty trigger."""
-    import shutil
-
     # Write bundle
     bundle_path = tmp_path / "current_model.pkl"
     bundle = {
