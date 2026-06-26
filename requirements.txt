@@ -19,3 +19,5 @@ prometheus-client~=0.19
 
 # Utilities
 tqdm~=4.66
+
+# Optional dependencies for testing and development
